@@ -8,11 +8,24 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.big.imageloader.MyApplication
 import com.big.imageloader.R
+import com.big.imageloader.di.DaggerFragmentComponent
+import com.big.imageloader.di.module.HomeFragmentModule
+import com.squareup.picasso.Picasso
+import javax.inject.Inject
 
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
+
+    @Inject
+    lateinit var picasso: Picasso
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        getDependencies()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,4 +41,18 @@ class HomeFragment : Fragment() {
         })
         return root
     }
+
+
+    private fun getDependencies() {
+        DaggerFragmentComponent
+            .builder()
+            .applicationComponent(
+                (context!!
+                    .applicationContext as MyApplication).applicationComponent
+            )
+            .homeFragmentModule(HomeFragmentModule(this))
+            .build()
+            .inject(this)
+    }
+
 }
