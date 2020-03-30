@@ -5,9 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.recyclerview.widget.RecyclerView
 import com.big.imageloader.R
 import com.big.imageloader.data.remote.response.search_response.Value
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
 class SelectableViewAdapter(private var imageList: MutableList<Value>,
@@ -41,13 +43,23 @@ class SelectableViewAdapter(private var imageList: MutableList<Value>,
 
     inner class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val selectableImage: ImageView = view.findViewById(R.id.iv_holder_adapter)
+        private val progressCircle : ProgressBar = view.findViewById(R.id.progress_circle)
 
         fun bind(city: Value, position:Int) {
             itemView.tag = position
 
             itemView.setOnClickListener(onClickListener)
-            //TODO add picasso loader here and once finished close progressbar here.
-            picasso.load(city.thumbnail).placeholder(R.drawable.ic_cloud_download_black_24dp).into(selectableImage)
+            picasso.load(city.thumbnail)
+                .placeholder(R.drawable.ic_cloud_download_black_24dp)
+                .into(selectableImage, object : Callback {
+                    override fun onSuccess() {
+                        progressCircle.visibility = View.GONE
+                    }
+
+                    override fun onError(ex: Exception) {
+
+                    }
+                })
         }
     }
 

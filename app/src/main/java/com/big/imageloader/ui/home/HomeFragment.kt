@@ -5,14 +5,12 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.big.imageloader.MyApplication
 import com.big.imageloader.R
@@ -20,6 +18,7 @@ import com.big.imageloader.data.remote.response.search_response.Value
 import com.big.imageloader.di.DaggerFragmentComponent
 import com.big.imageloader.di.module.HomeFragmentModule
 import com.big.imageloader.ui.adapter.SelectableViewAdapter
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
@@ -83,11 +82,11 @@ class HomeFragment : Fragment() {
                     }
 
                     override fun onFinish() {
-                        if(previousQuery != searchTerm) {
-                            previousQuery = searchTerm!!
+                        if (searchTerm!!.isNotEmpty() && previousQuery != searchTerm) {
+                            previousQuery = searchTerm
                             listOfSearchImages.clear()
 
-                            homeViewModel.getSearchResult(searchTerm!!, pageNumber, PAGE_SIZE)
+                            homeViewModel.getSearchResult(searchTerm, pageNumber, PAGE_SIZE)
                             timer?.cancel()
                         }
                     }
@@ -99,8 +98,7 @@ class HomeFragment : Fragment() {
         })
 
         homeViewModel.getSearchResults.observe(this, Observer {
-            //TODO Get search result and send to adapter
-            if(it != null) {
+            if (it != null) {
                 listOfSearchImages.addAll(it.value)
                 searchViewAdapter.notifyDataSetChanged()
             } else {
@@ -133,8 +131,41 @@ class HomeFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
 
-            //TODO make Dialog to show that Position's full image
+            showAlertDialog(
+                listOfSearchImages.get(selectedPosition).url,
+                selectedPosition + 1
+            )
         }
+
+    lateinit var dialog: AlertDialog
+    private fun showAlertDialog(mainURL: String, position: Int) {
+        val layout: View = activity!!.layoutInflater.inflate(R.layout.dialog_image, null);
+
+        val builder = AlertDialog.Builder(this.context!!)
+            .setCancelable(true)
+            .setView(layout)
+        layout.findViewById<TextView>(R.id.title).text = "Image position ${position}"
+        layout.findViewById<Button>(R.id.ok_text)
+            .setOnClickListener {
+                dialog.dismiss()
+            }
+        // Finally, make the alert dialog using builder
+        dialog = builder.create()
+        // Display the alert dialog on app interface
+        dialog.show()
+
+        picasso.load(mainURL)
+            .placeholder(R.drawable.ic_cloud_download_black_24dp)
+            .into(layout.findViewById(R.id.image_holder), object : Callback {
+                override fun onSuccess() {
+                    layout.findViewById<ProgressBar>(R.id.progress_circle).visibility = View.GONE
+                }
+
+                override fun onError(ex: Exception) {
+
+                }
+            })
+    }
 
     private fun getDependencies() {
         DaggerFragmentComponent
