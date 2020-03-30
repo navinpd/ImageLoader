@@ -4,4 +4,5 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="search_images">Search Images</string>
     <string name="no_data_searched">No Data Searched</string>
+    <string name="you_clicked">You Clicked Position %1$d</string>
 </resources>

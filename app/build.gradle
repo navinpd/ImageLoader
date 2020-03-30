@@ -22,12 +22,12 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI\"")
+            buildConfigField("String", "BASE_URL", "\"https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/\"")
             buildConfigField("String", "API_Key", "\"BofMNZTBBqmshktTK5ntRBEsupI0p1vRMFkjsnC01eGxGC14vw\"")
             buildConfigField("String", "API_Host", "\"contextualwebsearch-websearch-v1.p.rapidapi.com\"")
         }
         release {
-            buildConfigField("String", "BASE_URL", "\"https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI\"")
+            buildConfigField("String", "BASE_URL", "\"https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/\"")
             buildConfigField("String", "API_Key", "\"BofMNZTBBqmshktTK5ntRBEsupI0p1vRMFkjsnC01eGxGC14vw\"")
             buildConfigField("String", "API_Host", "\"contextualwebsearch-websearch-v1.p.rapidapi.com\"")
 
@@ -50,14 +50,16 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
     implementation 'com.google.android.material:material:1.1.0'
-
-
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.navigation:navigation-fragment:2.2.1'
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+
     implementation 'androidx.navigation:navigation-ui:2.2.1'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.2.1'
+    implementation 'androidx.navigation:navigation-fragment:2.2.1'
     implementation 'androidx.navigation:navigation-ui-ktx:2.2.1'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.2.1'
+
+    // ViewModel and LiveData
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
     //Image downloader
     implementation 'com.squareup.picasso:picasso:2.71828'
