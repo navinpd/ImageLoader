@@ -102,7 +102,7 @@ class HomeFragment : Fragment(), GetNextItems {
     }
 
     override fun callForNext() {
-        if (totalDataCount > 20 && totalDataCount < 20 * pageNumber) {
+        if (totalDataCount > 20 && 20 * pageNumber < totalDataCount) {
             pageNumber++
             progressBar.visibility = View.VISIBLE
             homeViewModel.getSearchResult(previousQuery, pageNumber, PAGE_SIZE)
