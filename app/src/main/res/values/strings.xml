@@ -3,6 +3,6 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="search_images">Search Images</string>
-    <string name="no_data_searched">No Data Searched</string>
+    <string name="no_data_searched">Click 🔍icon\nto download search results</string>
     <string name="you_clicked">You Clicked Position %1$d</string>
 </resources>

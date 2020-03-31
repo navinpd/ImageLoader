@@ -9,14 +9,19 @@ import android.widget.ProgressBar
 import androidx.recyclerview.widget.RecyclerView
 import com.big.imageloader.R
 import com.big.imageloader.data.remote.response.search_response.Value
+import com.big.imageloader.ui.home.GetNextItems
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
-class SelectableViewAdapter(private var imageList: MutableList<Value>,
-                            private var picasso: Picasso) :
+class SelectableViewAdapter(
+    private var imageList: MutableList<Value>,
+    private var picasso: Picasso
+) :
     RecyclerView.Adapter<SelectableViewAdapter.ImageViewHolder>() {
 
     var onClickListener: View.OnClickListener? = null
+
+    lateinit var requestForNextItem: GetNextItems
 
     override fun getItemCount() = imageList.size
 
@@ -32,20 +37,24 @@ class SelectableViewAdapter(private var imageList: MutableList<Value>,
         notifyDataSetChanged()
     }
 
-    fun setOnItemClickListener(itemClickListener: View.OnClickListener) {
+    fun setOnItemClickListener(itemClickListener: View.OnClickListener, requestForNextItem: GetNextItems) {
         onClickListener = itemClickListener
+        this.requestForNextItem = requestForNextItem
     }
 
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         holder.bind(imageList[position], position)
+        if (position == imageList.size - 1) {
+            requestForNextItem.callForNext()
+        }
     }
 
     inner class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val selectableImage: ImageView = view.findViewById(R.id.iv_holder_adapter)
-        private val progressCircle : ProgressBar = view.findViewById(R.id.progress_circle)
+        private val progressCircle: ProgressBar = view.findViewById(R.id.progress_circle)
 
-        fun bind(city: Value, position:Int) {
+        fun bind(city: Value, position: Int) {
             itemView.tag = position
 
             itemView.setOnClickListener(onClickListener)
@@ -64,7 +73,8 @@ class SelectableViewAdapter(private var imageList: MutableList<Value>,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ImageViewHolder(
-        LayoutInflater.from(parent.context).inflate(R.layout.adapter_selectable_image, parent, false)
+        LayoutInflater.from(parent.context)
+            .inflate(R.layout.adapter_selectable_image, parent, false)
     )
 
 

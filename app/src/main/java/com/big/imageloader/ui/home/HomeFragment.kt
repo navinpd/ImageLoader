@@ -1,13 +1,17 @@
 package com.big.imageloader.ui.home
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -22,15 +26,14 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
-class HomeFragment : Fragment() {
+
+class HomeFragment : Fragment() , GetNextItems {
 
     @Inject
     lateinit var picasso: Picasso
 
     @Inject
     lateinit var homeViewModel: HomeViewModel
-
-    private var timer: CountDownTimer? = null
 
     private var listOfSearchImages = mutableListOf<Value>()
 
@@ -63,50 +66,44 @@ class HomeFragment : Fragment() {
 
         val textView: TextView = root.findViewById(R.id.text_home)
 
-        homeViewModel.text.observe(this, Observer {
-            textView.text = it
-        })
+        val searchPlate = searchView.findViewById(R.id.search_src_text) as EditText
 
+        searchPlate.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                if (v.text.toString().isNotEmpty() && v.text.toString() != previousQuery) {
+                    progressBar.visibility = View.VISIBLE
+                    textView.visibility = View.VISIBLE
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(var1: String?): Boolean {
-                return true
-            }
+                    pageNumber = 1
+                    listOfSearchImages.clear()
 
-            override fun onQueryTextChange(searchTerm: String?): Boolean {
-                timer?.let { timer?.cancel() }
-
-                //Delay of 500mS to wait for next text
-                timer = object : CountDownTimer(500, 500) {
-                    override fun onTick(millisUntilFinished: Long) {
-                    }
-
-                    override fun onFinish() {
-                        if (searchTerm!!.isNotEmpty() && previousQuery != searchTerm) {
-                            previousQuery = searchTerm
-                            listOfSearchImages.clear()
-
-                            homeViewModel.getSearchResult(searchTerm, pageNumber, PAGE_SIZE)
-                            timer?.cancel()
-                        }
-                    }
+                    previousQuery = v.text.toString()
+                    homeViewModel.getSearchResult(v.text.toString(), pageNumber, PAGE_SIZE)
+                    val imm = context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(searchPlate.windowToken, 0)
                 }
-
-                timer?.start()
-                return true
             }
-        })
+            false
+        }
 
         homeViewModel.getSearchResults.observe(this, Observer {
+            progressBar.visibility = View.GONE
             if (it != null) {
                 listOfSearchImages.addAll(it.value)
                 searchViewAdapter.notifyDataSetChanged()
+                textView.visibility = View.GONE
             } else {
                 Toast.makeText(activity, "NULL VALUE", Toast.LENGTH_LONG).show()
             }
         })
 
         return root
+    }
+
+    override fun callForNext() {
+        pageNumber++
+        progressBar.visibility = View.VISIBLE
+        homeViewModel.getSearchResult(previousQuery, pageNumber, PAGE_SIZE)
     }
 
     private fun setUpView(view: View) {
@@ -117,7 +114,7 @@ class HomeFragment : Fragment() {
         searchViewAdapter = SelectableViewAdapter(listOfSearchImages, picasso)
         recyclerView.layoutManager = GridLayoutManager(context, 2)
         recyclerView.adapter = searchViewAdapter
-        searchViewAdapter.setOnItemClickListener(searchItemClickListener)
+        searchViewAdapter.setOnItemClickListener(searchItemClickListener, this)
     }
 
 
@@ -125,15 +122,8 @@ class HomeFragment : Fragment() {
         View.OnClickListener { view ->
             val selectedPosition = view.tag as Int
 
-            Toast.makeText(
-                this.context,
-                getString(R.string.you_clicked, selectedPosition),
-                Toast.LENGTH_SHORT
-            ).show()
-
             showAlertDialog(
-                listOfSearchImages.get(selectedPosition).url,
-                selectedPosition + 1
+                listOfSearchImages[selectedPosition].url, selectedPosition + 1
             )
         }
 
@@ -149,20 +139,26 @@ class HomeFragment : Fragment() {
             .setOnClickListener {
                 dialog.dismiss()
             }
-        // Finally, make the alert dialog using builder
+
         dialog = builder.create()
-        // Display the alert dialog on app interface
         dialog.show()
 
         picasso.load(mainURL)
             .placeholder(R.drawable.ic_cloud_download_black_24dp)
+
             .into(layout.findViewById(R.id.image_holder), object : Callback {
+
                 override fun onSuccess() {
                     layout.findViewById<ProgressBar>(R.id.progress_circle).visibility = View.GONE
                 }
 
                 override fun onError(ex: Exception) {
-
+                    layout.findViewById<ImageView>(R.id.image_holder).setImageDrawable(
+                        resources.getDrawable(
+                            R.drawable.ic_error_outline_black_24dp,
+                            null
+                        )
+                    )
                 }
             })
     }
@@ -179,4 +175,9 @@ class HomeFragment : Fragment() {
             .inject(this)
     }
 
+}
+
+
+interface GetNextItems {
+    fun callForNext()
 }
