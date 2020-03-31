@@ -1,6 +1,5 @@
 package com.big.imageloader.ui.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,15 +28,10 @@ class SelectableViewAdapter(
         val TAG = "SelectableViewAdapter"
     }
 
-    fun updateImageList(newImages: MutableList<Value>) {
-        //TODO UPDATE List
-        imageList.clear()
-        imageList.addAll(newImages)
-        Log.d(TAG, "$imageList")
-        notifyDataSetChanged()
-    }
-
-    fun setOnItemClickListener(itemClickListener: View.OnClickListener, requestForNextItem: GetNextItems) {
+    fun setOnItemClickListener(
+        itemClickListener: View.OnClickListener,
+        requestForNextItem: GetNextItems
+    ) {
         onClickListener = itemClickListener
         this.requestForNextItem = requestForNextItem
     }
@@ -55,9 +49,10 @@ class SelectableViewAdapter(
         private val progressCircle: ProgressBar = view.findViewById(R.id.progress_circle)
 
         fun bind(city: Value, position: Int) {
-            itemView.tag = position
 
+            itemView.tag = position
             itemView.setOnClickListener(onClickListener)
+
             picasso.load(city.thumbnail)
                 .placeholder(R.drawable.ic_cloud_download_black_24dp)
                 .into(selectableImage, object : Callback {

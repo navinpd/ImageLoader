@@ -1,6 +1,5 @@
 package com.big.imageloader.ui.home
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +10,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -27,7 +25,7 @@ import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
 
-class HomeFragment : Fragment() , GetNextItems {
+class HomeFragment : Fragment(), GetNextItems {
 
     @Inject
     lateinit var picasso: Picasso
@@ -43,6 +41,7 @@ class HomeFragment : Fragment() , GetNextItems {
     private lateinit var progressBar: ProgressBar
 
     private var pageNumber: Int = 1
+    private var totalDataCount: Int = 20
     private var previousQuery: String = ""
 
     companion object {
@@ -79,7 +78,8 @@ class HomeFragment : Fragment() , GetNextItems {
 
                     previousQuery = v.text.toString()
                     homeViewModel.getSearchResult(v.text.toString(), pageNumber, PAGE_SIZE)
-                    val imm = context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    val imm =
+                        context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(searchPlate.windowToken, 0)
                 }
             }
@@ -91,6 +91,7 @@ class HomeFragment : Fragment() , GetNextItems {
             if (it != null) {
                 listOfSearchImages.addAll(it.value)
                 searchViewAdapter.notifyDataSetChanged()
+                totalDataCount = it.totalCount
                 textView.visibility = View.GONE
             } else {
                 Toast.makeText(activity, "NULL VALUE", Toast.LENGTH_LONG).show()
@@ -101,9 +102,11 @@ class HomeFragment : Fragment() , GetNextItems {
     }
 
     override fun callForNext() {
-        pageNumber++
-        progressBar.visibility = View.VISIBLE
-        homeViewModel.getSearchResult(previousQuery, pageNumber, PAGE_SIZE)
+        if (totalDataCount > 20 && totalDataCount < 20 * pageNumber) {
+            pageNumber++
+            progressBar.visibility = View.VISIBLE
+            homeViewModel.getSearchResult(previousQuery, pageNumber, PAGE_SIZE)
+        }
     }
 
     private fun setUpView(view: View) {
