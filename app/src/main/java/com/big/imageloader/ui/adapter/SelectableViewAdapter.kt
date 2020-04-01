@@ -52,6 +52,7 @@ class SelectableViewAdapter(
 
             itemView.tag = position
             itemView.setOnClickListener(onClickListener)
+            progressCircle.visibility = View.VISIBLE
 
             picasso.load(city.thumbnail)
                 .placeholder(R.drawable.ic_cloud_download_black_24dp)
@@ -61,7 +62,8 @@ class SelectableViewAdapter(
                     }
 
                     override fun onError(ex: Exception) {
-
+                        progressCircle.visibility = View.GONE
+                        selectableImage.setImageResource(R.drawable.ic_error_outline_black_24dp)
                     }
                 })
         }

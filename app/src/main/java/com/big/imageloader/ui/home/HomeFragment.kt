@@ -20,6 +20,7 @@ import com.big.imageloader.data.remote.response.search_response.Value
 import com.big.imageloader.di.DaggerFragmentComponent
 import com.big.imageloader.di.module.HomeFragmentModule
 import com.big.imageloader.ui.adapter.SelectableViewAdapter
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
@@ -88,13 +89,18 @@ class HomeFragment : Fragment(), GetNextItems {
 
         homeViewModel.getSearchResults.observe(this, Observer {
             progressBar.visibility = View.GONE
-            if (it != null) {
+            if (it != null && it.totalCount > 0) {
                 listOfSearchImages.addAll(it.value)
                 searchViewAdapter.notifyDataSetChanged()
                 totalDataCount = it.totalCount
                 textView.visibility = View.GONE
+
+            } else if (it.totalCount == 0) {
+                Snackbar.make(root, "No Image Results Found", Snackbar.LENGTH_LONG).show()
+
             } else {
-                Toast.makeText(activity, "NULL VALUE", Toast.LENGTH_LONG).show()
+                Snackbar.make(root, "Network Error", Snackbar.LENGTH_LONG).show()
+
             }
         })
 
@@ -102,6 +108,7 @@ class HomeFragment : Fragment(), GetNextItems {
     }
 
     override fun callForNext() {
+        //TODO: Check for items visible instead of hardcoded value
         if (totalDataCount > 20 && 20 * pageNumber < totalDataCount) {
             pageNumber++
             progressBar.visibility = View.VISIBLE
@@ -133,15 +140,15 @@ class HomeFragment : Fragment(), GetNextItems {
     lateinit var dialog: AlertDialog
     private fun showAlertDialog(mainURL: String, position: Int) {
         val layout: View = activity!!.layoutInflater.inflate(R.layout.dialog_image, null);
-
-        val builder = AlertDialog.Builder(this.context!!)
-            .setCancelable(true)
-            .setView(layout)
         layout.findViewById<TextView>(R.id.title).text = "Image position ${position}"
         layout.findViewById<Button>(R.id.ok_text)
             .setOnClickListener {
                 dialog.dismiss()
             }
+        val imageHolder = layout.findViewById<ImageView>(R.id.image_holder)
+        val builder = AlertDialog.Builder(this.context!!)
+            .setCancelable(true)
+            .setView(layout)
 
         dialog = builder.create()
         dialog.show()
@@ -149,19 +156,15 @@ class HomeFragment : Fragment(), GetNextItems {
         picasso.load(mainURL)
             .placeholder(R.drawable.ic_cloud_download_black_24dp)
 
-            .into(layout.findViewById(R.id.image_holder), object : Callback {
+            .into(imageHolder, object : Callback {
 
                 override fun onSuccess() {
-                    layout.findViewById<ProgressBar>(R.id.progress_circle).visibility = View.GONE
+                    progressBar.visibility = View.GONE
                 }
 
                 override fun onError(ex: Exception) {
-                    layout.findViewById<ImageView>(R.id.image_holder).setImageDrawable(
-                        resources.getDrawable(
-                            R.drawable.ic_error_outline_black_24dp,
-                            null
-                        )
-                    )
+                    progressBar.visibility = View.GONE
+                    imageHolder.setImageResource(R.drawable.ic_error_outline_black_24dp)
                 }
             })
     }
@@ -180,7 +183,7 @@ class HomeFragment : Fragment(), GetNextItems {
 
 }
 
-
+//Interface to invoke query for next set of Images
 interface GetNextItems {
     fun callForNext()
 }
