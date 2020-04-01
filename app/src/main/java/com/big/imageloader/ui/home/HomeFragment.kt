@@ -95,7 +95,7 @@ class HomeFragment : Fragment(), GetNextItems {
                 totalDataCount = it.totalCount
                 textView.visibility = View.GONE
 
-            } else if (it.totalCount == 0) {
+            } else if (it != null && it.totalCount == 0) {
                 Snackbar.make(root, "No Image Results Found", Snackbar.LENGTH_LONG).show()
 
             } else {
@@ -145,6 +145,8 @@ class HomeFragment : Fragment(), GetNextItems {
             .setOnClickListener {
                 dialog.dismiss()
             }
+        val progressCircle = layout.findViewById<ProgressBar>(R.id.progress_circle)
+
         val imageHolder = layout.findViewById<ImageView>(R.id.image_holder)
         val builder = AlertDialog.Builder(this.context!!)
             .setCancelable(true)
@@ -159,11 +161,11 @@ class HomeFragment : Fragment(), GetNextItems {
             .into(imageHolder, object : Callback {
 
                 override fun onSuccess() {
-                    progressBar.visibility = View.GONE
+                    progressCircle.visibility = View.GONE
                 }
 
                 override fun onError(ex: Exception) {
-                    progressBar.visibility = View.GONE
+                    progressCircle.visibility = View.GONE
                     imageHolder.setImageResource(R.drawable.ic_error_outline_black_24dp)
                 }
             })
