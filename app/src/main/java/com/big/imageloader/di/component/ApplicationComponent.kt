@@ -6,7 +6,7 @@ import com.big.imageloader.MyApplication
 import com.big.imageloader.data.remote.NetworkService
 import com.big.imageloader.di.ApplicationContext
 import com.big.imageloader.di.module.ApplicationModule
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.RequestManager
 import dagger.Component
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Singleton
@@ -18,14 +18,14 @@ interface ApplicationComponent {
     fun inject(application: MyApplication)
 
     @ApplicationContext
-    fun getContext() : Context
+    fun getContext(): Context
 
     fun getCompositeDisposable(): CompositeDisposable
 
-    fun getNetworkService() : NetworkService
+    fun getNetworkService(): NetworkService
 
-    fun getPrefStore() : SharedPreferences
+    fun getPrefStore(): SharedPreferences
 
-    fun getPicasso() : Picasso
+    fun getPicasso(): RequestManager
 
 }

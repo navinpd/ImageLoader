@@ -1,5 +1,7 @@
 package com.big.imageloader.ui.adapter
 
+import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,12 +11,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.big.imageloader.R
 import com.big.imageloader.data.remote.response.search_response.Value
 import com.big.imageloader.ui.home.GetNextItems
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 
 class SelectableViewAdapter(
     private var imageList: MutableList<Value>,
-    private var picasso: Picasso
+    private var glide: RequestManager,
+    private val context: Context
 ) :
     RecyclerView.Adapter<SelectableViewAdapter.ImageViewHolder>() {
 
@@ -53,18 +58,34 @@ class SelectableViewAdapter(
             itemView.tag = position
             itemView.setOnClickListener(onClickListener)
 
-            picasso.load(city.thumbnail)
+            glide.load(city.thumbnail)
+                .centerCrop()
+                .error(R.drawable.ic_error_outline_black_24dp)
                 .placeholder(R.drawable.ic_cloud_download_black_24dp)
-                .into(selectableImage, object : Callback {
-                    override fun onSuccess() {
+                .addListener(object : RequestListener<Drawable?> {
+
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: com.bumptech.glide.request.target.Target<Drawable?>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
                         progressCircle.visibility = View.GONE
+                        return false
                     }
 
-                    override fun onError(ex: Exception) {
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: com.bumptech.glide.request.target.Target<Drawable?>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
                         progressCircle.visibility = View.GONE
-                        selectableImage.setImageResource(R.drawable.ic_error_outline_black_24dp)
+                        return false
                     }
                 })
+                .into(selectableImage)
         }
     }
 

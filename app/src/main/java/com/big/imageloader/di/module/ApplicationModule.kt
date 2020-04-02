@@ -7,7 +7,8 @@ import com.big.imageloader.MyApplication
 import com.big.imageloader.data.remote.NetworkService
 import com.big.imageloader.data.remote.Networking
 import com.big.imageloader.di.ApplicationContext
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import dagger.Module
 import dagger.Provides
 import io.reactivex.disposables.CompositeDisposable
@@ -27,7 +28,7 @@ class ApplicationModule(private val application: MyApplication) {
 
     @Provides
     @Singleton
-    fun providePicasso() : Picasso = Picasso.get()
+    fun providePicasso() : RequestManager = Glide.with(application)
 
     @Provides
     @Singleton

@@ -1,6 +1,7 @@
 package com.big.imageloader.ui.home
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,16 +21,18 @@ import com.big.imageloader.data.remote.response.search_response.Value
 import com.big.imageloader.di.DaggerFragmentComponent
 import com.big.imageloader.di.module.HomeFragmentModule
 import com.big.imageloader.ui.adapter.SelectableViewAdapter
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
 
 class HomeFragment : Fragment(), GetNextItems {
 
     @Inject
-    lateinit var picasso: Picasso
+    lateinit var glide: RequestManager
 
     @Inject
     lateinit var homeViewModel: HomeViewModel
@@ -121,7 +124,7 @@ class HomeFragment : Fragment(), GetNextItems {
         progressBar = view.findViewById(R.id.progress_circle)
 
         val recyclerView: RecyclerView = view.findViewById(R.id.search_view_rv)
-        searchViewAdapter = SelectableViewAdapter(listOfSearchImages, picasso)
+        searchViewAdapter = SelectableViewAdapter(listOfSearchImages, glide, this.requireContext())
         recyclerView.layoutManager = GridLayoutManager(context, 2)
         recyclerView.adapter = searchViewAdapter
         searchViewAdapter.setOnItemClickListener(searchItemClickListener, this)
@@ -155,20 +158,37 @@ class HomeFragment : Fragment(), GetNextItems {
         dialog = builder.create()
         dialog.show()
 
-        picasso.load(mainURL)
+        glide
+            .load(mainURL)
+            .centerCrop()
+            .error(R.drawable.ic_error_outline_black_24dp)
             .placeholder(R.drawable.ic_cloud_download_black_24dp)
+            .addListener(object : RequestListener<Drawable?> {
 
-            .into(imageHolder, object : Callback {
-
-                override fun onSuccess() {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<Drawable?>?,
+                    isFirstResource: Boolean
+                ): Boolean {
                     progressCircle.visibility = View.GONE
+                    progressBar.visibility = View.GONE
+                    return false
                 }
 
-                override fun onError(ex: Exception) {
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<Drawable?>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
                     progressCircle.visibility = View.GONE
-                    imageHolder.setImageResource(R.drawable.ic_error_outline_black_24dp)
+                    progressBar.visibility = View.GONE
+                    return false
                 }
             })
+            .into(imageHolder)
     }
 
     private fun getDependencies() {
