@@ -111,7 +111,6 @@ class HomeFragment : Fragment(), GetNextItems {
     }
 
     override fun callForNext() {
-        //TODO: Check for items visible instead of hardcoded value
         if (totalDataCount > 20 && 20 * pageNumber < totalDataCount) {
             pageNumber++
             progressBar.visibility = View.VISIBLE
