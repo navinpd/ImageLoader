@@ -27,12 +27,12 @@ class HomeViewModel @Inject constructor(
     val getSearchResults = MutableLiveData<ImageResponse>()
 
     fun getSearchResult(query: String, pageNumber: Int, pageSize: Int) {
+
         val keyString = "$query;$pageNumber"
         val localString = checkIfDataIsInLocal(keyString)
+
         if (localString!!.isNotEmpty()) {
-
             val response = mapper.readValue<ImageResponse>(localString)
-
             getSearchResults.postValue(response)
             return
         }
@@ -64,16 +64,12 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    fun checkIfDataIsInLocal(query: String): String? {
-        return if (sharedPreferences.contains(query)) {
-            sharedPreferences.getString(query, "")
-        } else {
-            ""
-        }
-    }
+    fun checkIfDataIsInLocal(query: String): String? =
+        if (sharedPreferences.contains(query)) sharedPreferences.getString(query, "") else ""
 
-    fun saveDataInLocal(key: String, data: String) {
+
+    fun saveDataInLocal(key: String, data: String) =
         sharedPreferences.edit().putString(key, data).apply()
-    }
+
 
 }

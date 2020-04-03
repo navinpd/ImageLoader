@@ -42,8 +42,8 @@ class HomeFragment : Fragment(), GetNextItems {
 
     private lateinit var searchViewAdapter: SelectableViewAdapter
     private lateinit var searchView: SearchView
-
     private lateinit var progressBar: ProgressBar
+    private lateinit var dialog: AlertDialog
 
     private var pageNumber: Int = 1
     private var totalDataCount: Int = 20
@@ -72,7 +72,7 @@ class HomeFragment : Fragment(), GetNextItems {
 
         val searchPlate = searchView.findViewById(R.id.search_src_text) as EditText
 
-        searchPlate.setOnEditorActionListener { v, actionId, event ->
+        searchPlate.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 if (v.text.toString().isNotEmpty() && v.text.toString() != previousQuery) {
                     progressBar.visibility = View.VISIBLE
@@ -96,6 +96,7 @@ class HomeFragment : Fragment(), GetNextItems {
 
         homeViewModel.getSearchResults.observe(this, Observer {
             progressBar.visibility = View.GONE
+
             if (it != null && it.totalCount > 0) {
                 listOfSearchImages.addAll(it.value)
                 searchViewAdapter.notifyDataSetChanged()
@@ -103,11 +104,11 @@ class HomeFragment : Fragment(), GetNextItems {
                 textView.visibility = View.GONE
 
             } else if (it != null && it.totalCount == 0) {
+
                 Snackbar.make(root, "No Image Results Found", Snackbar.LENGTH_LONG).show()
-
             } else {
-                Snackbar.make(root, "Network Error", Snackbar.LENGTH_LONG).show()
 
+                Snackbar.make(root, "Network Error", Snackbar.LENGTH_LONG).show()
             }
         })
 
@@ -129,11 +130,12 @@ class HomeFragment : Fragment(), GetNextItems {
         searchView = view.findViewById(R.id.search_sv)
         progressBar = view.findViewById(R.id.progress_circle)
 
-        val recyclerView: RecyclerView = view.findViewById(R.id.search_view_rv)
         searchViewAdapter = SelectableViewAdapter(listOfSearchImages, glide)
+        searchViewAdapter.setOnItemClickListener(searchItemClickListener, this)
+
+        val recyclerView: RecyclerView = view.findViewById(R.id.search_view_rv)
         recyclerView.layoutManager = GridLayoutManager(context, 2)
         recyclerView.adapter = searchViewAdapter
-        searchViewAdapter.setOnItemClickListener(searchItemClickListener, this)
     }
 
 
@@ -146,22 +148,23 @@ class HomeFragment : Fragment(), GetNextItems {
             )
         }
 
-    lateinit var dialog: AlertDialog
     private fun showAlertDialog(mainURL: String, position: Int) {
         val layout: View = activity!!.layoutInflater.inflate(R.layout.dialog_image, null);
         layout.findViewById<TextView>(R.id.title).text = "Image position ${position}"
+
         layout.findViewById<Button>(R.id.ok_text)
             .setOnClickListener {
                 dialog.dismiss()
             }
-        val progressCircle = layout.findViewById<ProgressBar>(R.id.progress_circle)
 
+        val progressCircle = layout.findViewById<ProgressBar>(R.id.progress_circle)
         val imageHolder = layout.findViewById<ImageView>(R.id.image_holder)
-        val builder = AlertDialog.Builder(this.context!!)
+
+        val dialogBuilder = AlertDialog.Builder(this.context!!)
             .setCancelable(true)
             .setView(layout)
 
-        dialog = builder.create()
+        dialog = dialogBuilder.create()
         dialog.show()
 
         glide
@@ -177,6 +180,7 @@ class HomeFragment : Fragment(), GetNextItems {
                     target: com.bumptech.glide.request.target.Target<Drawable?>?,
                     isFirstResource: Boolean
                 ): Boolean {
+
                     progressCircle.visibility = View.GONE
                     progressBar.visibility = View.GONE
                     return false
@@ -189,6 +193,7 @@ class HomeFragment : Fragment(), GetNextItems {
                     dataSource: DataSource?,
                     isFirstResource: Boolean
                 ): Boolean {
+
                     progressCircle.visibility = View.GONE
                     progressBar.visibility = View.GONE
                     return false

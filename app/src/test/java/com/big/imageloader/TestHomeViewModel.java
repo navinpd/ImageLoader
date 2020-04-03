@@ -83,7 +83,7 @@ public class TestHomeViewModel {
         doNothing().when(editor).apply();
 
         //Action
-        homeViewModel.saveDataInLocal(SAMPLE_KEY, SAMPLE_RESPONSE);
+        homeViewModel.saveDataInLocal(SAMPLE_KEY_WORD, SAMPLE_RESPONSE);
 
         //Verify
         verify(editor, times(1)).putString(anyString(), anyString());
@@ -96,10 +96,10 @@ public class TestHomeViewModel {
      */
     public void _03TestCheckIfDataIsInLocal_ForEmptyString() {
         //Mocking
-        when(sharedPreferences.contains(SAMPLE_KEY)).thenReturn(false);
+        when(sharedPreferences.contains(SAMPLE_KEY_WORD)).thenReturn(false);
 
         //Action & Verify
-        assertEquals(homeViewModel.checkIfDataIsInLocal(SAMPLE_KEY), "");
+        assertEquals(homeViewModel.checkIfDataIsInLocal(SAMPLE_KEY_WORD), "");
     }
 
     @Test
@@ -108,11 +108,11 @@ public class TestHomeViewModel {
      */
     public void _04TestCheckIfDataIsInLocal_ForActualValue() {
         //Mocking
-        when(sharedPreferences.contains(SAMPLE_KEY)).thenReturn(true);
-        when(sharedPreferences.getString(SAMPLE_KEY, "")).thenReturn(SAMPLE_RESPONSE);
+        when(sharedPreferences.contains(SAMPLE_KEY_WORD)).thenReturn(true);
+        when(sharedPreferences.getString(SAMPLE_KEY_WORD, "")).thenReturn(SAMPLE_RESPONSE);
 
         //Action & Verify
-        assertEquals(homeViewModel.checkIfDataIsInLocal(SAMPLE_KEY), SAMPLE_RESPONSE);
+        assertEquals(homeViewModel.checkIfDataIsInLocal(SAMPLE_KEY_WORD), SAMPLE_RESPONSE);
     }
 
     @Test
@@ -125,11 +125,11 @@ public class TestHomeViewModel {
         int itemsPerPage = 20;
 
         //Mocking
-        when(sharedPreferences.contains(SAMPLE_KEY + ";" + pageNumber)).thenReturn(true);
-        when(sharedPreferences.getString(SAMPLE_KEY + ";" + pageNumber, "")).thenReturn(SAMPLE_RESPONSE);
+        when(sharedPreferences.contains(SAMPLE_KEY_WORD + ";" + pageNumber)).thenReturn(true);
+        when(sharedPreferences.getString(SAMPLE_KEY_WORD + ";" + pageNumber, "")).thenReturn(SAMPLE_RESPONSE);
 
         // Action
-        homeViewModel.getSearchResult(SAMPLE_KEY, pageNumber, itemsPerPage);
+        homeViewModel.getSearchResult(SAMPLE_KEY_WORD, pageNumber, itemsPerPage);
 
         // Verify
         verify(networkService, never()).searchImages(anyString(), anyString(),
@@ -144,9 +144,9 @@ public class TestHomeViewModel {
         sharedPreferences = null;
     }
 
-    private String SAMPLE_KEY = "WORKING";
+    private static final String SAMPLE_KEY_WORD = "WORKING";
 
-    private String SAMPLE_RESPONSE = "{\n" +
+    private static final String SAMPLE_RESPONSE = "{\n" +
             "  \"_type\": \"images\",\n" +
             "  \"totalCount\": 2618,\n" +
             "  \"value\": [\n" +
