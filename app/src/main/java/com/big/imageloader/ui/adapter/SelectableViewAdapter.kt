@@ -1,6 +1,5 @@
 package com.big.imageloader.ui.adapter
 
-import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,7 @@ import android.widget.ProgressBar
 import androidx.recyclerview.widget.RecyclerView
 import com.big.imageloader.R
 import com.big.imageloader.data.remote.response.search_response.Value
-import com.big.imageloader.ui.home.GetNextItems
+import com.big.imageloader.ui.fragment.GetNextItems
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -18,8 +17,7 @@ import com.bumptech.glide.request.RequestListener
 
 class SelectableViewAdapter(
     private var imageList: MutableList<Value>,
-    private var glide: RequestManager,
-    private val context: Context
+    private var glide: RequestManager
 ) :
     RecyclerView.Adapter<SelectableViewAdapter.ImageViewHolder>() {
 

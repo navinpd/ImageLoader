@@ -1,4 +1,4 @@
-package com.big.imageloader.ui.dashboard
+package com.big.imageloader.ui.fragment
 
 import android.content.Context
 import android.os.Bundle
@@ -16,6 +16,8 @@ import com.big.imageloader.MyApplication
 import com.big.imageloader.R
 import com.big.imageloader.di.DaggerFragmentComponent
 import com.big.imageloader.di.module.DashboardFragmentModule
+import com.big.imageloader.ui.viewmodel.DashboardViewModel
+
 
 class DashboardFragment : Fragment() {
 
@@ -32,10 +34,15 @@ class DashboardFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         dashboardViewModel =
-            ViewModelProviders.of(this).get(DashboardViewModel::class.java)
+            ViewModelProviders.of(this)
+                .get(DashboardViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_dashboard, container, false)
-        val searchView: SearchView = root.findViewById(R.id.search_sv)
-        val webView: WebView = root.findViewById(R.id.web_view)
+        val searchView: SearchView = root.findViewById(
+            R.id.search_sv
+        )
+        val webView: WebView = root.findViewById(
+            R.id.web_view
+        )
         webView.settings.javaScriptEnabled = true
         webView.loadUrl("https://contextualwebsearch.com/")
 
@@ -57,13 +64,16 @@ class DashboardFragment : Fragment() {
     }
 
     private fun getDependencies() {
-        DaggerFragmentComponent
-            .builder()
+        DaggerFragmentComponent.builder()
             .applicationComponent(
                 (context!!
                     .applicationContext as MyApplication).applicationComponent
             )
-            .dashboardFragmentModule(DashboardFragmentModule(this))
+            .dashboardFragmentModule(
+                DashboardFragmentModule(
+                    this
+                )
+            )
             .build()
             .inject(this)
     }

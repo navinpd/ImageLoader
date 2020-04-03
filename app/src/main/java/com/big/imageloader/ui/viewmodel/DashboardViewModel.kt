@@ -1,4 +1,4 @@
-package com.big.imageloader.ui.dashboard
+package com.big.imageloader.ui.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

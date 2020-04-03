@@ -1,4 +1,4 @@
-package com.big.imageloader.ui.home
+package com.big.imageloader.ui.fragment
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -21,6 +21,7 @@ import com.big.imageloader.data.remote.response.search_response.Value
 import com.big.imageloader.di.DaggerFragmentComponent
 import com.big.imageloader.di.module.HomeFragmentModule
 import com.big.imageloader.ui.adapter.SelectableViewAdapter
+import com.big.imageloader.ui.viewmodel.HomeViewModel
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -81,7 +82,10 @@ class HomeFragment : Fragment(), GetNextItems {
                     listOfSearchImages.clear()
 
                     previousQuery = v.text.toString()
-                    homeViewModel.getSearchResult(v.text.toString(), pageNumber, PAGE_SIZE)
+                    homeViewModel.getSearchResult(
+                        v.text.toString(), pageNumber,
+                        PAGE_SIZE
+                    )
                     val imm =
                         context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(searchPlate.windowToken, 0)
@@ -114,7 +118,10 @@ class HomeFragment : Fragment(), GetNextItems {
         if (totalDataCount > 20 && 20 * pageNumber < totalDataCount) {
             pageNumber++
             progressBar.visibility = View.VISIBLE
-            homeViewModel.getSearchResult(previousQuery, pageNumber, PAGE_SIZE)
+            homeViewModel.getSearchResult(
+                previousQuery, pageNumber,
+                PAGE_SIZE
+            )
         }
     }
 
@@ -123,7 +130,7 @@ class HomeFragment : Fragment(), GetNextItems {
         progressBar = view.findViewById(R.id.progress_circle)
 
         val recyclerView: RecyclerView = view.findViewById(R.id.search_view_rv)
-        searchViewAdapter = SelectableViewAdapter(listOfSearchImages, glide, this.requireContext())
+        searchViewAdapter = SelectableViewAdapter(listOfSearchImages, glide)
         recyclerView.layoutManager = GridLayoutManager(context, 2)
         recyclerView.adapter = searchViewAdapter
         searchViewAdapter.setOnItemClickListener(searchItemClickListener, this)
