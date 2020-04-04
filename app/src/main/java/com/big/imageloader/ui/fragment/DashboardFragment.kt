@@ -43,9 +43,8 @@ class DashboardFragment : Fragment() {
         val webView: WebView = root.findViewById(
             R.id.web_view
         )
-        webView.settings.javaScriptEnabled = true
         webView.loadUrl("https://contextualwebsearch.com/")
-
+        setDesktopMode(webView, true)
         val searchPlate = searchView.findViewById(R.id.search_src_text) as EditText
 
         searchPlate.setOnEditorActionListener { v, actionId, event ->
@@ -61,6 +60,33 @@ class DashboardFragment : Fragment() {
             false
         }
         return root
+    }
+
+    private fun setDesktopMode(webView: WebView, enabled: Boolean) {
+        var newUserAgent = webView.settings.userAgentString
+        if (enabled) {
+            try {
+                val ua = webView.settings.userAgentString
+                val androidOSString = webView.settings.userAgentString
+                    .substring(ua.indexOf("("), ua.indexOf(")") + 1)
+                newUserAgent = webView.settings.userAgentString
+                    .replace(androidOSString, "(X11; Linux x86_64)")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        } else {
+            newUserAgent = null
+        }
+        webView.settings.javaScriptEnabled = true
+        webView.settings.userAgentString = newUserAgent
+        webView.settings.useWideViewPort = enabled
+        webView.settings.loadWithOverviewMode = enabled
+
+        webView.settings.setSupportZoom(true)
+        webView.settings.builtInZoomControls = true
+        webView.settings.displayZoomControls = false
+
+        webView.reload()
     }
 
     private fun getDependencies() {

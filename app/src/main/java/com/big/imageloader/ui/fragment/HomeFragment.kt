@@ -47,7 +47,7 @@ class HomeFragment : Fragment(), GetNextItems {
 
     private var pageNumber: Int = 1
     private var totalDataCount: Int = 20
-    private var previousQuery: String = ""
+    private var currentQuery: String = ""
 
     companion object {
         val TAG: String = "HomeFragment"
@@ -74,14 +74,14 @@ class HomeFragment : Fragment(), GetNextItems {
 
         searchPlate.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                if (v.text.toString().isNotEmpty() && v.text.toString() != previousQuery) {
+                if (v.text.toString().isNotEmpty()) {
                     progressBar.visibility = View.VISIBLE
                     textView.visibility = View.VISIBLE
 
                     pageNumber = 1
                     listOfSearchImages.clear()
 
-                    previousQuery = v.text.toString()
+                    currentQuery = v.text.toString()
                     homeViewModel.getSearchResult(
                         v.text.toString(), pageNumber,
                         PAGE_SIZE
@@ -103,10 +103,10 @@ class HomeFragment : Fragment(), GetNextItems {
                 totalDataCount = it.totalCount
                 textView.visibility = View.GONE
 
-            } else if (it != null && it.totalCount == 0) {
+            } else if (it != null && it.totalCount == 0 && root != null) {
 
                 Snackbar.make(root, "No Image Results Found", Snackbar.LENGTH_LONG).show()
-            } else {
+            } else if (root != null) {
 
                 Snackbar.make(root, "Network Error", Snackbar.LENGTH_LONG).show()
             }
@@ -120,7 +120,7 @@ class HomeFragment : Fragment(), GetNextItems {
             pageNumber++
             progressBar.visibility = View.VISIBLE
             homeViewModel.getSearchResult(
-                previousQuery, pageNumber,
+                currentQuery, pageNumber,
                 PAGE_SIZE
             )
         }
@@ -181,8 +181,8 @@ class HomeFragment : Fragment(), GetNextItems {
                     isFirstResource: Boolean
                 ): Boolean {
 
+                    Toast.makeText(context, e!!.message, Toast.LENGTH_LONG).show()
                     progressCircle.visibility = View.GONE
-                    progressBar.visibility = View.GONE
                     return false
                 }
 
@@ -195,7 +195,6 @@ class HomeFragment : Fragment(), GetNextItems {
                 ): Boolean {
 
                     progressCircle.visibility = View.GONE
-                    progressBar.visibility = View.GONE
                     return false
                 }
             })
